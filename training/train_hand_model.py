@@ -9,12 +9,21 @@ from keras.layers import Dense, Dropout, BatchNormalization
 from keras.utils import to_categorical
 from keras.callbacks import EarlyStopping
 import joblib
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Save the fitted scaler
 
 
+# Get file paths from environment variables
+FEATURES_PATH = os.getenv('FEATURES_PATH', 'X_all_gestures_labeled.csv')
+MODEL_PATH = os.getenv('MODEL_PATH', 'models/gesture_classifier.h5')
+SCALER_PATH = os.getenv('SCALER_PATH', 'models/scaler.pkl')
+
 # Step 1: Load and shuffle data
-df = pd.read_csv("X_all_gestures_labeled.csv")
+df = pd.read_csv(FEATURES_PATH)
 df = shuffle(df, random_state=42)
 
 # Step 2: Separate features and labels
@@ -24,8 +33,8 @@ y = df["label"]
 # Step 3: Normalize features (0 to 1)
 scaler = MinMaxScaler()
 X = scaler.fit_transform(X)
-joblib.dump(scaler, "models/scaler.pkl")
-print("Scaler saved to models/scaler.pkl")
+joblib.dump(scaler, SCALER_PATH)
+print(f"Scaler saved to {SCALER_PATH}")
 # Step 4: Encode labels
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
@@ -61,5 +70,5 @@ print(f"\n Test Accuracy: {acc * 100:.2f}%")
 
 # Step 10: Save the model
 os.makedirs("models", exist_ok=True)
-model.save("models/gesture_classifier.h5")  # modern format
-print(" Model saved to models/gesture_classifier.h5")
+model.save(MODEL_PATH)  # modern format
+print(f"Model saved to {MODEL_PATH}")

@@ -1,7 +1,15 @@
 import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Get file paths from environment variables
+DATASET_PATH = os.getenv('DATASET_PATH', 'datasets/hand_landmarks.csv')
 
 # Load full dataset
-df = pd.read_csv("datasets/hand_landmarks.csv")
+df = pd.read_csv(DATASET_PATH)
 
 # Show unique gesture labels
 print("Unique gesture labels:", df["sign"].unique())

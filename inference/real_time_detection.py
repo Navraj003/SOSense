@@ -11,6 +11,10 @@ import mediapipe as mp
 import numpy as np
 from keras.models import load_model
 from twilio.rest import Client
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Project structure adjustment
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -29,17 +33,33 @@ gesture_labels = {
     8: "neutral"
 }
 
-CONFIDENCE_THRESHOLD = 0.7
-ALERT_COOLDOWN_SECONDS = 60
-WARMUP_SECONDS = 2
+# Load environment variables
+CONFIDENCE_THRESHOLD = float(os.getenv('CONFIDENCE_THRESHOLD', '0.7'))
+ALERT_COOLDOWN_SECONDS = int(os.getenv('ALERT_COOLDOWN_SECONDS', '60'))
+WARMUP_SECONDS = int(os.getenv('WARMUP_SECONDS', '2'))
 
 # Email config
+SENDER_EMAIL = os.getenv('SENDER_EMAIL')
+SENDER_PASSWORD = os.getenv('SENDER_PASSWORD')
+RECIPIENT_EMAIL = os.getenv('RECIPIENT_EMAIL')
+
+# Twilio config
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_FROM_NUMBER = os.getenv('TWILIO_FROM_NUMBER')
+TO_NUMBER = os.getenv('TO_NUMBER')
 
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
+# File paths
+MODEL_PATH = os.getenv('MODEL_PATH', 'models/gesture_classifier.h5')
+SCALER_PATH = os.getenv('SCALER_PATH', 'models/scaler.pkl')
+print(f"[DEBUG] Using model path: {MODEL_PATH}")
+print(f"[DEBUG] Using scaler path: {SCALER_PATH}")
+
 # --- Load Models ---
-model = load_model('models/gesture_classifier.h5')
-scaler = joblib.load("models/scaler.pkl")
+model = load_model(MODEL_PATH)
+scaler = joblib.load(SCALER_PATH)
 
 # --- Email ---
 def send_email_alert():
